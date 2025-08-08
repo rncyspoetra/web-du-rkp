@@ -55,8 +55,8 @@ class DaftarUsulanRKPExport implements FromCollection, WithEvents, WithStyles, S
         if ($rowCount === 0) {
             for ($i = 0; $i < 2; $i++) {
                 $currentRow = $startRow + $i;
+                // Kolom A isi $no, kolom lainnya isi '-'
                 $sheet->fromArray([$no, $bidang, '-', '-', '-', '-', '-', '-', '-'], null, 'A' . $currentRow);
-
                 $sheet->getStyle("D{$currentRow}")->getAlignment()->setHorizontal('center');
             }
 
@@ -64,17 +64,18 @@ class DaftarUsulanRKPExport implements FromCollection, WithEvents, WithStyles, S
             $total = '-';
         } else {
             foreach ($data as $i => $row) {
-                $sheet->fromArray(array_values($row), null, 'A' . ($startRow + $i));
+                // Ubah array_values agar kolom A selalu $no
+                $rowArray = array_values($row);
+                $rowArray[0] = $no; // Pastikan kolom pertama = nomor bidang
+                $sheet->fromArray($rowArray, null, 'A' . ($startRow + $i));
             }
 
             $endRow = $startRow + $rowCount - 1;
-
             $total = number_format($data->sum(function ($item) {
                 return (int) str_replace('.', '', $item['Prakiraan Biaya Jumlah (Rp)']);
             }), 0, ',', '.');
         }
 
-        // Merge dan style kolom A dan B baik ada data atau tidak
         if ($endRow > $startRow) {
             $sheet->mergeCells("A{$startRow}:A{$endRow}");
             $sheet->mergeCells("B{$startRow}:B{$endRow}");
@@ -105,6 +106,7 @@ class DaftarUsulanRKPExport implements FromCollection, WithEvents, WithStyles, S
 
         return $jumlahRow + 1;
     }
+
 
 
     public function __construct($sumberPembiayaan, $tahun)

@@ -127,9 +127,12 @@ class PendudukResource extends Resource
                     ->label('Nama Lengkap')
                     ->searchable(),
 
-                TextColumn::make('jenis_kelamin')
-                    ->label('Jenis Kelamin')
-                    ->searchable(),
+                TextColumn::make('kartuKeluarga.rt')
+                    ->label('RT / RW')
+                    ->formatStateUsing(fn($state, $record) => 'RT ' . $record->kartuKeluarga?->rt . ' / RW ' . $record->kartuKeluarga?->rw),
+
+                TextColumn::make('kartuKeluarga.alamat')
+                    ->label('Alamat'),
             ])
             ->defaultSort('id', 'asc')
             ->filters([
@@ -159,7 +162,7 @@ class PendudukResource extends Resource
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
-                                    $set('rt', null);
+                                    $set('rw', null);
                                 }
                             })
                             ->disabled(fn(callable $get) => $get('rw')),
