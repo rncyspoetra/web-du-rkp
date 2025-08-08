@@ -159,7 +159,7 @@ class PendudukResource extends Resource
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
-                                    $set('rw', null); // reset RW
+                                    $set('rt', null);
                                 }
                             })
                             ->disabled(fn(callable $get) => $get('rw')),
@@ -174,7 +174,7 @@ class PendudukResource extends Resource
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
-                                    $set('rt', null); // reset RT
+                                    $set('rt', null);
                                 }
                             })
                             ->disabled(fn(callable $get) => $get('rt')),

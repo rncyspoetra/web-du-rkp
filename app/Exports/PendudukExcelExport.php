@@ -120,8 +120,6 @@ class PendudukExcelExport implements
         return $judul;
     }
 
-
-
     public function styles(Worksheet $sheet)
     {
         $headingRow = 3;
@@ -169,7 +167,6 @@ class PendudukExcelExport implements
 
         return [];
     }
-
 
     public function registerEvents(): array
     {

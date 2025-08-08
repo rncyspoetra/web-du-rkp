@@ -3,8 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DaftarUsulanRKPResource\Pages;
-use App\Models\DaftarUsulanRKP;
-use App\Models\SumberPembiayaan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,8 +10,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Filters\SelectFilter;
+use App\Models\SumberPembiayaan;
+use App\Models\DaftarUsulanRKP;
 
 
 class DaftarUsulanRKPResource extends Resource
@@ -30,7 +31,7 @@ class DaftarUsulanRKPResource extends Resource
                 Select::make('bidang')
                     ->label('Bidang Kegiatan')
                     ->options([
-                        'Penyelengaraan Pemerintahan Desa' => 'Penyelengaraan Pemerintahan Desa',
+                        'Penyelenggaraan Pemerintahan Desa' => 'Penyelenggaraan Pemerintahan Desa',
                         'Pembangunan Desa' => 'Pembangunan Desa',
                         'Pembinaan Masyarakat' => 'Pembinaan Masyarakat',
                         'Pemberdayaan Masyarakat' => 'Pemberdayaan Masyarakat',
@@ -101,6 +102,50 @@ class DaftarUsulanRKPResource extends Resource
                     ->relationship('sumberPembiayaan', 'tahun')
                     ->searchable()
                     ->preload(),
+            ])
+            ->headerActions([
+                Action::make('exportCustom')
+                    ->label('Export Excel')
+                    ->form([
+                        Select::make('sumber_pembiayaan')
+                            ->label('Sumber Pembiayaan')
+                            ->options(
+                                SumberPembiayaan::select('sumber_pembiayaan')->distinct()->pluck('sumber_pembiayaan', 'sumber_pembiayaan')->toArray()
+                            )
+                            ->placeholder('Pilih Sumber Pembiayaan')
+                            ->required()
+                            ->reactive(),
+
+                        Select::make('tahun')
+                            ->label('Tahun')
+                            ->options(
+                                SumberPembiayaan::select('tahun')->distinct()->pluck('tahun', 'tahun')->toArray()
+                            )
+                            ->placeholder('Tahun')
+                            ->required()
+                            ->reactive()
+                    ])
+
+                    ->action(function (array $data) {
+                        $sumber_pembiayaan = $data['sumber_pembiayaan'];
+                        $tahun = $data['tahun'];
+
+                        $queryParams = [];
+
+                        if ($sumber_pembiayaan) {
+                            $queryParams['sumber_pembiayaan'] = $sumber_pembiayaan;
+                        }
+
+                        if ($tahun) {
+                            $queryParams['tahun'] = $tahun;
+                        }
+
+                        $queryString = http_build_query($queryParams);
+
+                        return redirect()->away(
+                            route('du-rkp.export') . ($queryString ? '?' . $queryString : '')
+                        );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
