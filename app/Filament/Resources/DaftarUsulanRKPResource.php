@@ -93,16 +93,39 @@ class DaftarUsulanRKPResource extends Resource
             ->filters([
                 SelectFilter::make('sumber_pembiayaan')
                     ->label('Sumber Pembiayaan')
-                    ->relationship('sumberPembiayaan', 'sumber_pembiayaan')
+                    ->options(
+                        SumberPembiayaan::select('sumber_pembiayaan')
+                            ->distinct()
+                            ->pluck('sumber_pembiayaan', 'sumber_pembiayaan')
+                    )
+                    ->query(function ($query, $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('sumberPembiayaan', function ($q) use ($data) {
+                                $q->where('sumber_pembiayaan', $data['value']);
+                            });
+                        }
+                    })
                     ->searchable()
                     ->preload(),
 
                 SelectFilter::make('tahun')
                     ->label('Tahun')
-                    ->relationship('sumberPembiayaan', 'tahun')
+                    ->options(
+                        SumberPembiayaan::select('tahun')
+                            ->distinct()
+                            ->pluck('tahun', 'tahun')
+                    )
+                    ->query(function ($query, $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('sumberPembiayaan', function ($q) use ($data) {
+                                $q->where('tahun', $data['value']);
+                            });
+                        }
+                    })
                     ->searchable()
                     ->preload(),
             ])
+
             ->headerActions([
                 Action::make('exportCustom')
                     ->label('Export Excel')

@@ -138,16 +138,35 @@ class PendudukResource extends Resource
             ->filters([
                 SelectFilter::make('rt')
                     ->label('Filter RT')
-                    ->relationship('kartuKeluarga', 'rt')
+                    ->options(
+                        KartuKeluarga::select('rt')->distinct()->pluck('rt', 'rt')
+                    )
+                    ->query(function ($query, $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('kartuKeluarga', function ($q) use ($data) {
+                                $q->where('rt', $data['value']);
+                            });
+                        }
+                    })
                     ->searchable()
                     ->preload(),
 
                 SelectFilter::make('rw')
                     ->label('Filter RW')
-                    ->relationship('kartuKeluarga', 'rw')
+                    ->options(
+                        KartuKeluarga::select('rw')->distinct()->pluck('rw', 'rw')
+                    )
+                    ->query(function ($query, $data) {
+                        if (!empty($data['value'])) {
+                            $query->whereHas('kartuKeluarga', function ($q) use ($data) {
+                                $q->where('rw', $data['value']);
+                            });
+                        }
+                    })
                     ->searchable()
                     ->preload(),
             ])
+
             ->headerActions([
                 Action::make('exportCustom')
                     ->label('Export Excel')
