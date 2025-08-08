@@ -56,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.png'))
             ->widgets([
                 StatistikDashboard::class,
+                \App\Filament\Widgets\BackupDatabaseWidget::class,
             ]);
     }
 }
